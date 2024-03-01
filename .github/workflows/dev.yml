@@ -1,0 +1,39 @@
+name: Dev
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+      - '*.org'
+      - 'tools/**'
+
+permissions:
+  contents: read
+
+jobs:
+
+  ci:
+    strategy:
+      matrix:
+        go: [1.21.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go }}
+
+    - name: Disable cgo
+      run: go env -w CGO_ENABLED=0
+
+    - name: make ci
+      run: make ci
+
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
