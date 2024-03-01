@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strings"
 	"text/tabwriter"
 )
@@ -48,12 +49,18 @@ func mainErr(args []string) error {
 
 	ignoreFile := fset.String("i", "", "`File` with keywords to ignored, one per line")
 	outputHtml := fset.Bool("html", false, "Generate HTML output")
+	printVersion := fset.Bool("version", false, "Print version")
 
 	if err := fset.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return nil
 		}
 		return err
+	}
+
+	if *printVersion {
+		version()
+		return nil
 	}
 
 	if fset.NArg() != 1 {
@@ -115,6 +122,29 @@ func mainErr(args []string) error {
 	}
 
 	return nil
+}
+
+func version() {
+	bi, _ := debug.ReadBuildInfo()
+	g := func(k string) string {
+		for _, v := range bi.Settings {
+			if v.Key == k {
+				return v.Value
+			}
+		}
+		return ""
+	}
+	fmt.Println("go     ", bi.GoVersion)
+	fmt.Println("main   ", bi.Main.Version)
+	if v := g("vcs.revision"); v != "" {
+		fmt.Println("commit ", g("vcs.revision"))
+	}
+	if v := g("vcs.time"); v != "" {
+		fmt.Println("time   ", g("vcs.time"))
+	}
+	if v := g("vcs.modified"); v != "" {
+		fmt.Println("dirty  ", g("vcs.modified"))
+	}
 }
 
 const htmlHeader = `
