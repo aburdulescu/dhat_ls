@@ -111,10 +111,11 @@ func mainErr(args []string) error {
 
 		for j := len(pp.Frames) - 1; j >= 0; j-- {
 			frame := report.GetFrame(pp.Frames[j])
+			fmt.Fprintf(w, "%d\t", len(pp.Frames)-j)
 			if *outputHtml {
-				fmt.Fprintf(w, "%d\t%s\n", len(pp.Frames)-j-1, html.EscapeString(frame))
+				fmt.Fprintf(w, "%s\n", html.EscapeString(frame))
 			} else {
-				fmt.Fprintf(w, "%d\t%s\n", len(pp.Frames)-j-1, frame)
+				fmt.Fprintf(w, "%s\n", frame)
 			}
 		}
 
