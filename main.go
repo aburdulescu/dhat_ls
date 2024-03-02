@@ -83,6 +83,20 @@ func mainErr(args []string) error {
 		fmt.Print(htmlHeader)
 	}
 
+	if *outputHtml {
+		fmt.Printf("<br><pre>\n")
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
+	fmt.Fprintf(w, " \t \n")
+	fmt.Fprintf(w, "Command:\t%s\n", report.Cmd)
+	fmt.Fprintf(w, "PID:\t%d\n", report.PID)
+	w.Flush()
+
+	if *outputHtml {
+		fmt.Printf("</pre><br><hr><br>\n")
+	}
+
 	allocCount := 1
 
 	for i, pp := range report.ProgramPoints {
@@ -186,7 +200,7 @@ details > summary {
   cursor: pointer;
 }
 
-details > pre {
+pre {
   border-radius: 0 0 10px 10px;
   background-color: #ddd;
   padding: 2px 6px;
@@ -200,7 +214,7 @@ details[open] > summary {
 
 button {
   background-color: #ddd;
-  font-size: 18px;
+  font-size: 15px;
   width: 10%;
 }
 
