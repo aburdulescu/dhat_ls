@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"html"
 	"os"
 	"runtime/debug"
 	"strings"
@@ -95,6 +96,12 @@ func mainErr(args []string) error {
 			fmt.Printf("\n==== Allocation #%d ====\n", allocCount)
 		}
 
+		fmt.Printf(
+			"Total: %d bytes in %d blocks, avg size %d bytes\n",
+			pp.TotalBytes, pp.TotalBlocks, pp.TotalBytes/pp.TotalBlocks,
+		)
+		fmt.Printf("\n")
+
 		w := tabwriter.NewWriter(os.Stdout, 0, 4, 4, ' ', 0)
 
 		fmt.Fprintf(w, "#\tFrame\n")
@@ -104,7 +111,11 @@ func mainErr(args []string) error {
 
 		for j := len(pp.Frames) - 1; j >= 0; j-- {
 			frame := report.GetFrame(pp.Frames[j])
-			fmt.Fprintf(w, "%d\t%s\n", len(pp.Frames)-j-1, frame)
+			if *outputHtml {
+				fmt.Fprintf(w, "%d\t%s\n", len(pp.Frames)-j-1, html.EscapeString(frame))
+			} else {
+				fmt.Fprintf(w, "%d\t%s\n", len(pp.Frames)-j-1, frame)
+			}
 		}
 
 		w.Flush()
@@ -159,7 +170,7 @@ const htmlHeader = `
 
 <style>
 body {
-font-size: 18px;
+font-size: 15px;
 }
 pre {
 overflow-x: auto;
