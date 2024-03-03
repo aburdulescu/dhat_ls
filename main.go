@@ -8,6 +8,7 @@ import (
 	"html"
 	"os"
 	"runtime/debug"
+	"runtime/pprof"
 	"strings"
 	"text/tabwriter"
 )
@@ -51,6 +52,8 @@ func mainErr(args []string) error {
 	ignoreFile := fset.String("i", "", "`File` with keywords to ignored, one per line")
 	outputHtml := fset.Bool("html", false, "Generate HTML output")
 	printVersion := fset.Bool("version", false, "Print version")
+	cpuProfile := fset.Bool("profile-cpu", false, "Write CPU profile")
+	memProfile := fset.Bool("profile-mem", false, "Write memory profile")
 
 	if err := fset.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
@@ -68,6 +71,25 @@ func mainErr(args []string) error {
 		fset.Usage()
 		return fmt.Errorf("need DHAT file")
 	}
+
+	if *cpuProfile {
+		f, err := os.Create("profile.cpu")
+		if err != nil {
+			return err
+		}
+		_ = pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+	defer func() {
+		if *memProfile {
+			f, err := os.Create("profile.mem")
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+			}
+			_ = pprof.WriteHeapProfile(f)
+			f.Close()
+		}
+	}()
 
 	ignoreList, err := parseIgnoreFile(*ignoreFile)
 	if err != nil {
