@@ -10,7 +10,6 @@ import (
 	"runtime/debug"
 	"runtime/pprof"
 	"strings"
-	"text/tabwriter"
 )
 
 const usage = `Usage: dhat_ls [FLAGS] DHAT_FILE
@@ -101,6 +100,14 @@ func mainErr(args []string) error {
 		return err
 	}
 
+	const dhatVersion = 2
+	if report.Version != dhatVersion {
+		return fmt.Errorf(
+			"DHAT report version %d is not supported, only version %d is supported",
+			report.Version, dhatVersion,
+		)
+	}
+
 	if *outputHtml {
 		fmt.Print(htmlHeader)
 	}
@@ -109,11 +116,10 @@ func mainErr(args []string) error {
 		fmt.Printf("<br><pre>\n")
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-	fmt.Fprintf(w, " \t \n")
-	fmt.Fprintf(w, "Command:\t%s\n", report.Cmd)
-	fmt.Fprintf(w, "PID:\t%d\n", report.PID)
-	w.Flush()
+	fmt.Printf("Command: %s\n", report.Cmd)
+	fmt.Printf("PID: %d\n", report.PID)
+	fmt.Printf("Mode: %s\n", report.InvocationMode)
+	fmt.Printf("t-end: %d %s\n", report.TimeAtEnd, report.TimeUnit)
 
 	if *outputHtml {
 		fmt.Printf("</pre><br><hr><br>\n")
@@ -132,10 +138,7 @@ func mainErr(args []string) error {
 			fmt.Printf("\n==== Allocation #%d ====\n", allocCount)
 		}
 
-		fmt.Printf(
-			"Total: %d bytes in %d blocks, avg size %d bytes\n",
-			pp.TotalBytes, pp.TotalBlocks, pp.TotalBytes/pp.TotalBlocks,
-		)
+		fmt.Printf("%d bytes in %d blocks\n", pp.TotalBytes, pp.TotalBlocks)
 
 		allocCount++
 
