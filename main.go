@@ -127,7 +127,7 @@ func mainErr(args []string) error {
 		}
 
 		if *outputHtml {
-			fmt.Printf("<details><summary>Allocation #%d</summary><br><pre>\n", allocCount)
+			fmt.Printf("<details><summary>Allocation #%d</summary><br><p>\n", allocCount)
 		} else {
 			fmt.Printf("\n==== Allocation #%d ====\n", allocCount)
 		}
@@ -136,26 +136,20 @@ func mainErr(args []string) error {
 			"Total: %d bytes in %d blocks, avg size %d bytes\n",
 			pp.TotalBytes, pp.TotalBlocks, pp.TotalBytes/pp.TotalBlocks,
 		)
-		fmt.Printf("\n")
-
-		w := tabwriter.NewWriter(os.Stdout, 0, 4, 4, ' ', 0)
-
-		fmt.Fprintf(w, "#\tFrame\n")
-		fmt.Fprintf(w, "-\t-----\n")
 
 		allocCount++
 
-		for j := len(pp.Frames) - 1; j >= 0; j-- {
-			frame := report.GetFrame(pp.Frames[j])
-			fmt.Fprintf(w, "%d\t", len(pp.Frames)-j)
-			if *outputHtml {
-				fmt.Fprintf(w, "%s\n", html.EscapeString(frame))
-			} else {
-				fmt.Fprintf(w, "%s\n", frame)
-			}
+		if *outputHtml {
+			fmt.Println("</p><pre>")
 		}
 
-		w.Flush()
+		for j := len(pp.Frames) - 1; j >= 0; j-- {
+			frame := report.GetFrame(pp.Frames[j])
+			if *outputHtml {
+				frame = html.EscapeString(frame)
+			}
+			fmt.Printf("%s\n", frame)
+		}
 
 		if *outputHtml {
 			fmt.Println("</pre></details><br>")
