@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-const usage = `Usage: dhat_ls [FLAGS] DHAT_FILE
+const usage = `Usage: dhatless [FLAGS] DHAT_FILE
 
 Generate a report with all allocations recorded in the given DHAT output file.
 

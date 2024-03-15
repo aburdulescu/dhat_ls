@@ -1,3 +1,3 @@
-module github.com/aburdulescu/dhat_ls
+module github.com/aburdulescu/dhatless
 
 go 1.21.0

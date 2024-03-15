@@ -1,12 +1,14 @@
-# dhat_ls
+# dhatless
 
-Generate a report with all allocations recorded in a DHAT output file.
+Pretty printer for valgrind's DHAT report.
+
+Generates a report with all allocations recorded in a DHAT output file.
 
 ## Download
 
-Go to the [latest release](https://github.com/aburdulescu/dhat_ls/releases/latest)
+Go to the [latest release](https://github.com/aburdulescu/dhatless/releases/latest)
 and download the binary for your OS and CPU architecture.
 
 ## Usage
 
-Run `dhat_ls --help` for usage information.
+Run `dhatless --help` for usage information.
